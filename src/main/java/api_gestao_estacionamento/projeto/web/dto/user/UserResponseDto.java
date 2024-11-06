@@ -1,4 +1,4 @@
-package api_gestao_estacionamento.projeto.web.dto;
+package api_gestao_estacionamento.projeto.web.dto.user;
 
 import api_gestao_estacionamento.projeto.model.User;
 import lombok.AllArgsConstructor;

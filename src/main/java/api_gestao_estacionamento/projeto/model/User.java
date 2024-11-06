@@ -1,6 +1,6 @@
 package api_gestao_estacionamento.projeto.model;
 
-import api_gestao_estacionamento.projeto.web.dto.UserCreateDto;
+import api_gestao_estacionamento.projeto.web.dto.user.UserCreateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package api_gestao_estacionamento.projeto.web.mapper;
 
-import api_gestao_estacionamento.projeto.web.dto.PageableDto;
+import api_gestao_estacionamento.projeto.web.dto.pageable.PageableDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;

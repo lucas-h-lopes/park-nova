@@ -1,8 +1,8 @@
 package api_gestao_estacionamento.projeto.web.mapper;
 
 import api_gestao_estacionamento.projeto.model.User;
-import api_gestao_estacionamento.projeto.web.dto.UserCreateDto;
-import api_gestao_estacionamento.projeto.web.dto.UserResponseDto;
+import api_gestao_estacionamento.projeto.web.dto.user.UserCreateDto;
+import api_gestao_estacionamento.projeto.web.dto.user.UserResponseDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

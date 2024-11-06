@@ -1,0 +1,53 @@
+# Diretório de builds
+/target/
+/out/
+/bin/
+
+# Arquivos de log
+*.log
+*.tmp
+
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db
+
+# Diretórios do Maven
+.mvn/
+!**/src/main/**/mvnw*
+!**/src/main/**/mvnw.cmd
+HELP.md
+.gitattributes
+
+# Diretórios do Gradle
+.gradle/
+/build/
+
+# Configurações do IntelliJ IDEA
+/.idea
+*.iml
+*.iws
+
+# Configurações do Eclipse
+.project
+.classpath
+.settings/
+
+# Arquivos do sistema operacional
+*.swp
+*.swo
+
+# Arquivos de propriedades locais
+application-local.properties
+application-dev.properties
+application-test.properties
+
+# Credenciais e informações sensíveis
+.env
+*.jks
+
+# Arquivos do Spring Boot específicos de cache
+.springBeans
+
+# Teste de integração e cobertura de código
+test-output/
+jacoco.exec

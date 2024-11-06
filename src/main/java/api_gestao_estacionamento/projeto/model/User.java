@@ -1,5 +1,6 @@
 package api_gestao_estacionamento.projeto.model;
 
+import api_gestao_estacionamento.projeto.web.dto.UserCreateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -53,6 +54,11 @@ public class User implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public User(UserCreateDto dto){
+        this.username = dto.getUsername();
+        this.password = dto.getPassword();
     }
 
 

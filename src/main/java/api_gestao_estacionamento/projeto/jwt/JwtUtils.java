@@ -34,7 +34,7 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    private final Integer EXPIRATION_MINUTES = 2;
+    private final Integer EXPIRATION_MINUTES = 30;
 
     private Date calculateExpiration(Date start){
         LocalDateTime localDateTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();

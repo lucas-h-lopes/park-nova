@@ -1,9 +1,11 @@
 package api_gestao_estacionamento.projeto.service;
 
+import api_gestao_estacionamento.projeto.jwt.JwtUserDetails;
 import api_gestao_estacionamento.projeto.model.User;
 import api_gestao_estacionamento.projeto.repository.UserRepository;
 import api_gestao_estacionamento.projeto.repository.projection.UserProjection;
 import api_gestao_estacionamento.projeto.service.exception.EntityNotFoundException;
+import api_gestao_estacionamento.projeto.service.exception.PasswordInvalidPassword;
 import api_gestao_estacionamento.projeto.service.exception.UsernameUniqueViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -40,6 +42,18 @@ public class UserService {
     @Transactional(readOnly = true)
     public Page<UserProjection> findAllUsers(Pageable pageable) {
         return userRepository.findAllPageable(pageable);
+    }
+
+    @Transactional
+    public void updatePassword(String currentPassword, String newPassword, String confirmationPassword, JwtUserDetails details){
+        if (!newPassword.equals(confirmationPassword)){
+            throw new PasswordInvalidPassword("A nova senha e confirmação de senha não conferem");
+        }
+        User user = findUserById(details.getId());
+        if (!encoder.matches(currentPassword, user.getPassword())){
+            throw new PasswordInvalidPassword("A senha atual não confere com a senha do usuário");
+        }
+        user.setPassword(encoder.encode(newPassword));
     }
 
     @Transactional

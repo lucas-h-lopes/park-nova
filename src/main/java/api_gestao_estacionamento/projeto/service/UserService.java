@@ -48,12 +48,14 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @Transactional(readOnly = true)
     public User loadUserByUsername(String username) {
         return userRepository.loadUserByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Usuário com username '%s' não foi encontrado no sistema", username))
         );
     }
 
+    @Transactional(readOnly = true)
     public User.Role findRoleFromUsername(String username) {
         return userRepository.getRoleByUsername(username);
     }

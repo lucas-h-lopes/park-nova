@@ -13,10 +13,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCreateDto {
-    @NotBlank(message = "Username não pode ser nulo, vazio ou conter somente espaços em branco")
+    @NotBlank(message = "O username não pode ser nulo, vazio ou conter somente espaços em branco")
     @Pattern(regexp = "^[A-Za-z0-9]{4,}@[A-Za-z0-9]{2,}\\.[A-Za-z]{2,}$", message = "Username precisa estar no seguinte formato: 'lucas@gmail.com'")
     private String username;
-    @NotBlank(message = "Password não pode ser nulo, vazio ou conter somente espaços em branco")
+    @NotBlank(message = "A senha não pode ser nula, vazia ou conter somente espaços em branco")
     @Size(min = 6, max = 15, message = "Password deve possuir de 6 a 15 caracteres")
     private String password;
 }

@@ -1,4 +1,4 @@
-# Park Nova
+# park-nova
 
 ![park-nova](./images/park-nova-att.png)
 

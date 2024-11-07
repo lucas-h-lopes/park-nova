@@ -1,5 +1,6 @@
 package api_gestao_estacionamento.projeto.config;
 
+import api_gestao_estacionamento.projeto.jwt.JwtEntryPoint;
 import api_gestao_estacionamento.projeto.jwt.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class SecurityConfig {
                         antMatcher(HttpMethod.POST, userResourceBaseUrl),
                         antMatcher(HttpMethod.POST, authenticateResourceBaseUrl)
                 ).permitAll().anyRequest().authenticated())
+                .exceptionHandling(x -> x.authenticationEntryPoint(new JwtEntryPoint()))
                 .addFilterBefore(requestFilter(), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();

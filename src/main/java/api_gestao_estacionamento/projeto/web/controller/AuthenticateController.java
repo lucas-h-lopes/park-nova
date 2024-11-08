@@ -4,6 +4,10 @@ import api_gestao_estacionamento.projeto.jwt.JwtToken;
 import api_gestao_estacionamento.projeto.jwt.JwtUserDetailsService;
 import api_gestao_estacionamento.projeto.web.dto.authenticate.AuthenticateDto;
 import api_gestao_estacionamento.projeto.web.exception.CustomExceptionBody;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,12 @@ public class AuthenticateController {
     @Autowired
     private JwtUserDetailsService service;
 
+    @Operation(summary = "Autenticar usuário",description = "Autentica o usuário com as credenciais fornecidas e retorna um token JWT.",
+            tags = {"Login"}, responses = {
+            @ApiResponse(responseCode = "200", description = "Autenticado com sucesso!", content = @Content(mediaType = "application/json", schema = @Schema(implementation = JwtToken.class))),
+            @ApiResponse(responseCode = "400", description = "Credenciais informadas são inválidas.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
+            @ApiResponse(responseCode = "422", description = "Dados informados são inválidos.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class)))
+    })
     @PostMapping
     public ResponseEntity<?> login(@RequestBody @Valid AuthenticateDto dto, HttpServletRequest request){
         try{

@@ -37,7 +37,11 @@ public class SecurityConfig {
                 .httpBasic(x -> x.disable())
                 .authorizeHttpRequests(x -> x.requestMatchers(
                         antMatcher(HttpMethod.POST, userResourceBaseUrl),
-                        antMatcher(HttpMethod.POST, authenticateResourceBaseUrl)
+                        antMatcher(HttpMethod.POST, authenticateResourceBaseUrl),
+                        antMatcher("/documentacao/**"),
+                        antMatcher("/swagger-ui"),
+                        antMatcher("/swagger-ui/**"),
+                        antMatcher("/v3/api-docs/**")
                 ).permitAll().anyRequest().authenticated())
                 .exceptionHandling(x -> x.authenticationEntryPoint(new JwtEntryPoint()))
                 .addFilterBefore(requestFilter(), UsernamePasswordAuthenticationFilter.class)

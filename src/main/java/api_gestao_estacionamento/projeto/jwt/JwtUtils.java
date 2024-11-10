@@ -23,7 +23,7 @@ import java.util.Date;
 @Slf4j
 public class JwtUtils {
 
-    @Value("${secret.key}")
+    @Value("${jwt.secret}")
     private String secretKey;
     @Value("${jwt.bearer}")
     private String bearer;

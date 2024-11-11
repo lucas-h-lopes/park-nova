@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 @TestConfiguration
 public class TestConfig {
     @Bean(name = "dbSeedingConfig")
-    public DbSeedingConfig disableDbSeeding(){
+    public DbSeedingConfig disableDbSeeding() {
         return null;
     }
 }

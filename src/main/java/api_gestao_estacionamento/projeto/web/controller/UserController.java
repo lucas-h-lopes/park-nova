@@ -99,7 +99,6 @@ public class UserController {
 
     @Operation(summary = "Atualizar usuário",description = "Atualiza a senha do usuário autenticado que enviou a requisição. É necessário estar autenticado para acessar este recurso.",security = @SecurityRequirement(name = "security"), tags = {"Usuarios","Atualizar"}, responses = {
             @ApiResponse(responseCode = "204", description = "Senha atualizada com sucesso!"),
-            @ApiResponse(responseCode = "403", description = "O usuário não possui permissão para visualizar este recurso.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "422", description = "Dados informados são inválidos.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "400", description = "Possíveis causas:<br/>" +
                     "- A nova senha e confirmação de senha não conferem<br/>" +

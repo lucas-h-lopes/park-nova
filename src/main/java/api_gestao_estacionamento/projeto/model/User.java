@@ -28,6 +28,8 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
     @Column(name = "username", nullable = false, unique = true, length = 150)
     private String username;
     @Column(name = "password", nullable = false, length = 200)
@@ -53,6 +55,11 @@ public class User implements Serializable {
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
 
+    @Column(name = "activation_token")
+    private String activationToken;
+    @Column(name = "is_active")
+    private boolean isActive = false;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -66,7 +73,8 @@ public class User implements Serializable {
         return Objects.hashCode(id);
     }
 
-    public User(UserCreateDto dto){
+    public User(UserCreateDto dto) {
+        this.name = dto.getName();
         this.username = dto.getUsername();
         this.password = dto.getPassword();
     }

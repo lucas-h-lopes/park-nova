@@ -45,6 +45,7 @@ public class AuthenticateController {
             tags = {"Login"}, responses = {
             @ApiResponse(responseCode = "200", description = "Autenticado com sucesso!", content = @Content(mediaType = "application/json", schema = @Schema(implementation = JwtToken.class))),
             @ApiResponse(responseCode = "400", description = "Credenciais informadas são inválidas.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário está inativo.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "422", description = "Dados informados são inválidos.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class)))
     })
     @PostMapping

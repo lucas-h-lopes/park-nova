@@ -14,8 +14,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthenticateDto {
-    @NotBlank(message = "Username não pode ser nulo, vazio ou conter somente espaços em branco")
-    @Pattern(regexp = "^[A-Za-z0-9]{4,}@[A-Za-z0-9]{2,}\\.[A-Za-z]{2,}$", message = "Username precisa estar no seguinte formato: 'lucas@gmail.com'")
+    @NotBlank(message = "O username não pode ser nulo, vazio ou conter somente espaços em branco")
+    @Pattern(regexp = "^[A-Za-z0-9.]{4,}@[A-Za-z0-9]{2,}\\.[A-Za-z]{2,}$", message = "Username precisa estar no seguinte formato: 'lucas@gmail.com'")
     @Schema(description = "O nome de usuário deve ser um e-mail válido.", example = "lucas@gmail.com")
     private String username;
     @NotBlank(message = "Password não pode ser nulo, vazio ou conter somente espaços em branco")

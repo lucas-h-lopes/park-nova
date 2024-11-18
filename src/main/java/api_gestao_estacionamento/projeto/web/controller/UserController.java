@@ -6,6 +6,7 @@ import api_gestao_estacionamento.projeto.repository.projection.UserProjection;
 import api_gestao_estacionamento.projeto.service.ActivationService;
 import api_gestao_estacionamento.projeto.service.UserService;
 import api_gestao_estacionamento.projeto.service.mail.EmailService;
+import api_gestao_estacionamento.projeto.util.TemplateUtils;
 import api_gestao_estacionamento.projeto.web.dto.pageable.PageableDto;
 import api_gestao_estacionamento.projeto.web.dto.template.TemplateDto;
 import api_gestao_estacionamento.projeto.web.dto.user.UserCreateDto;
@@ -133,13 +134,16 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "E-mail enviado com sucesso!"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "403", description = "O usuário não possui permissão para visualizar este recurso.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
-            @ApiResponse(responseCode = "409", description = "Token já consumido pelo usuário.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "409", description = "O usuário já está ativo no sistema.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "422", description = "Dados informados são inválidos.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
+            @ApiResponse(responseCode = "400", description = "Template não existente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/send-email")
     public ResponseEntity<Void> sendMail(@RequestBody @Valid TemplateDto dto) {
         User user = userService.loadUserByUsername(dto.getUsername(), true);
         userService.checkIfUserIsActive(user);
+        TemplateUtils.isTemplateValid(dto.getTemplate());
 
         emailService.sendMail(user.getUsername(), dto.getTemplate());
         return ResponseEntity.noContent().build();

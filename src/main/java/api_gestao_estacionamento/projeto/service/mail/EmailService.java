@@ -5,6 +5,8 @@ import api_gestao_estacionamento.projeto.service.UserService;
 import api_gestao_estacionamento.projeto.service.mail.templates.EmailTemplate;
 import api_gestao_estacionamento.projeto.util.ActivationTokenUtils;
 import api_gestao_estacionamento.projeto.util.TemplateUtils;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,16 +32,18 @@ public class EmailService {
 
     private final UserService userService;
 
-    private SimpleMailMessage prepareEmail(String recipient, EmailTemplate emailTemplate) {
+    private MimeMessage prepareMimeMessage(String recipient, EmailTemplate emailTemplate) {
         try {
-            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-            simpleMailMessage.setFrom(sender);
-            simpleMailMessage.setSubject(emailTemplate.getSubject());
-            simpleMailMessage.setText(emailTemplate.getText());
-            simpleMailMessage.setTo(recipient);
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
-            return simpleMailMessage;
-        } catch (MailException e) {
+            helper.setFrom(sender);
+            helper.setTo(recipient);
+            helper.setSubject(emailTemplate.getSubject());
+            helper.setText(emailTemplate.getText(), true);
+
+            return mimeMessage;
+        } catch (MailException | MessagingException e) {
             log.info("Falha no envio de email - {}", e.getLocalizedMessage());
         }
         return null;
@@ -51,7 +56,7 @@ public class EmailService {
             String activationToken = ActivationTokenUtils.generateActivationToken();
 
             EmailTemplate emailTemplate = TemplateUtils.getTemplate(template, user, activationToken);
-            SimpleMailMessage message = prepareEmail(username, emailTemplate);
+            MimeMessage message = prepareMimeMessage(username, emailTemplate);
             if (message != null && !user.isActive()) {
                 javaMailSender.send(message);
                 user.setActivationToken(activationToken);

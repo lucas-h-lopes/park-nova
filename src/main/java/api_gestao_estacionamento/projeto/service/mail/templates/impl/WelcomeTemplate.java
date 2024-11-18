@@ -2,16 +2,26 @@ package api_gestao_estacionamento.projeto.service.mail.templates.impl;
 
 import api_gestao_estacionamento.projeto.model.User;
 import api_gestao_estacionamento.projeto.service.mail.templates.EmailTemplate;
+import api_gestao_estacionamento.projeto.util.TemplateUtils;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 
 @Getter
 public class WelcomeTemplate extends EmailTemplate {
 
+    private final static String body = "<h2>Olá, %s!</h2>" +
+            "                   <p>Agradecemos por se registrar no <i>Park Nova</i>, a solução inteligente e inovadora para a gestão de estacionamentos.</p> " +
+            "                    Para concluir seu cadastro e ativar sua conta, por favor, clique no link abaixo:" +
+            "                    <br/><br/><a href=\"%s\">Ativar Conta</a>" +
+            "                    <br/><br/>Se você não realizou esse cadastro, por favor, ignore este e-mail." +
+            "                    <br/>Estamos à disposição para qualquer dúvida ou assistência." +
+            "                    <br/><br/>Atenciosamente," +
+            "                    <br/><b>Equipe Park Nova</b>";
+
+
     public WelcomeTemplate(User user, String activationToken) {
-        super("Ativação de Conta!", String.format("Olá, %s!\n\nObrigado por se cadastrar no Park Nova, a solução inteligente para a gestão de estacionamentos.\nPara completar o processo de registro, você precisa ativar sua conta.\n\nPor favor, clique no link abaixo para ativar sua conta e começar a utilizar todos os recursos disponíveis:\n\nhttp://localhost:8080/api/v1/users/activate-account/%d?token=%s\n\nSe você não se cadastrou no Park Nova, pode ignorar este email.\n\nEstamos à disposição para qualquer dúvida!\n\nAtenciosamente,\n\nEquipe Park Nova", getFirstName(user.getName()), user.getId(), activationToken));
+        super("Ativação de Conta!", TemplateUtils.loadHtml(String.format(body, getFirstName(user.getName()), String.format("http://localhost:8080/api/v1/users/activate-account/%d?token=%s", user.getId(), activationToken))));
     }
 
     private static String getFirstName(String fullname) {

@@ -4,10 +4,12 @@ import api_gestao_estacionamento.projeto.jwt.JwtUserDetails;
 import api_gestao_estacionamento.projeto.model.User;
 import api_gestao_estacionamento.projeto.repository.UserRepository;
 import api_gestao_estacionamento.projeto.repository.projection.UserProjection;
+import api_gestao_estacionamento.projeto.service.exception.ActivationTokenAlreadyUsedException;
 import api_gestao_estacionamento.projeto.service.exception.EntityNotFoundException;
 import api_gestao_estacionamento.projeto.service.exception.PasswordInvalidPassword;
 import api_gestao_estacionamento.projeto.service.exception.UsernameUniqueViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -26,6 +29,7 @@ public class UserService {
     public User insert(User u) {
         try {
             u.setPassword(encoder.encode(u.getPassword()));
+            u.setName(u.getName().trim());
             return userRepository.save(u);
         } catch (DataIntegrityViolationException e) {
             throw new UsernameUniqueViolationException(String.format("O nome de usuário '%s' já está cadastrado no sistema", u.getUsername()));
@@ -45,12 +49,12 @@ public class UserService {
     }
 
     @Transactional
-    public void updatePassword(String currentPassword, String newPassword, String confirmationPassword, JwtUserDetails details){
-        if (!newPassword.equals(confirmationPassword)){
+    public void updatePassword(String currentPassword, String newPassword, String confirmationPassword, JwtUserDetails details) {
+        if (!newPassword.equals(confirmationPassword)) {
             throw new PasswordInvalidPassword("A nova senha e confirmação de senha não conferem");
         }
         User user = findUserById(details.getId());
-        if (!encoder.matches(currentPassword, user.getPassword())){
+        if (!encoder.matches(currentPassword, user.getPassword())) {
             throw new PasswordInvalidPassword("A senha atual não confere com a senha do usuário");
         }
         user.setPassword(encoder.encode(newPassword));
@@ -63,10 +67,22 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User loadUserByUsername(String username) {
+    public User loadUserByUsername(String username, boolean throwExceptionDefaultMessageIfNotFound) {
+        if(throwExceptionDefaultMessageIfNotFound) {
+            return userRepository.loadUserByUsername(username).orElseThrow(
+                    () -> new EntityNotFoundException(String.format("Usuário com username '%s' não foi encontrado no sistema", username))
+            );
+        }
         return userRepository.loadUserByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Usuário com username '%s' não foi encontrado no sistema", username))
+                () -> new EntityNotFoundException("Email e/ou senha inválidos")
         );
+    }
+    
+    public boolean checkIfUserIsActive(User u) {
+        if (u.isActive()) {
+            throw new ActivationTokenAlreadyUsedException("O usuário já está ativo no sistema");
+        }
+        return true;
     }
 
     @Transactional(readOnly = true)

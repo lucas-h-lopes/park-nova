@@ -3,8 +3,11 @@ package api_gestao_estacionamento.projeto.web.controller;
 import api_gestao_estacionamento.projeto.jwt.JwtUserDetails;
 import api_gestao_estacionamento.projeto.model.User;
 import api_gestao_estacionamento.projeto.repository.projection.UserProjection;
+import api_gestao_estacionamento.projeto.service.ActivationService;
 import api_gestao_estacionamento.projeto.service.UserService;
+import api_gestao_estacionamento.projeto.service.mail.EmailService;
 import api_gestao_estacionamento.projeto.web.dto.pageable.PageableDto;
+import api_gestao_estacionamento.projeto.web.dto.template.TemplateDto;
 import api_gestao_estacionamento.projeto.web.dto.user.UserCreateDto;
 import api_gestao_estacionamento.projeto.web.dto.user.UserNewPasswordDto;
 import api_gestao_estacionamento.projeto.web.dto.user.UserResponseDto;
@@ -20,7 +23,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,8 +43,10 @@ import java.net.URI;
 public class UserController {
 
     private final UserService userService;
+    private final EmailService emailService;
+    private final ActivationService activationService;
 
-    @Operation(summary = "Criar usuário", description = "Insere um usuário no sistema.", tags = {"Usuarios","Criar"}, responses = {
+    @Operation(summary = "Criar usuário", description = "Insere um usuário no sistema. Faz uma chamada ao método de envio de e-mail para o usuário criado, utilizando o template de boas-vindas.", tags = {"Usuarios", "Criar", "E-mail"}, responses = {
             @ApiResponse(responseCode = "201", description = "Criado com sucesso!", headers = @Header(name = HttpHeaders.LOCATION, description = "URL do novo usuário"), content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
             @ApiResponse(responseCode = "409", description = "Username já cadastrado no sistema.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "422", description = "Dados informados são inválidos.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class)))
@@ -55,10 +59,11 @@ public class UserController {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(user.getId()).toUri();
+        emailService.sendMail(user.getUsername(), "WELCOME");
         return ResponseEntity.created(uri).body(result);
     }
 
-    @Operation(summary = "Buscar usuário", description = "Retorna um usuário existente pelo seu Id. É necessário estar autenticado para acessar este recurso.", security = @SecurityRequirement(name = "security"), tags = {"Usuarios","Buscar um"}, responses = {
+    @Operation(summary = "Buscar usuário", description = "Retorna um usuário existente pelo seu Id. É necessário estar autenticado para acessar este recurso.", security = @SecurityRequirement(name = "security"), tags = {"Usuarios", "Buscar um"}, responses = {
             @ApiResponse(responseCode = "200", description = "Usuário retornado com sucesso!", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "403", description = "O usuário não possui permissão para visualizar este recurso.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class)))
@@ -70,7 +75,7 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDto(user));
     }
 
-    @Operation(summary = "Buscar usuários", description = "Retorna todos os usuários cadastrados no sistema. Recurso possui paginação e é necessário estar autenticado para acessá-lo.", security = @SecurityRequirement(name = "security"), tags = {"Usuarios","Buscar todos"}, parameters = {
+    @Operation(summary = "Buscar usuários", description = "Retorna todos os usuários cadastrados no sistema. Recurso possui paginação e é necessário estar autenticado para acessá-lo.", security = @SecurityRequirement(name = "security"), tags = {"Usuarios", "Buscar todos"}, parameters = {
             @Parameter(in = ParameterIn.QUERY, name = "page", description = "Número da página a ser retornada na consulta.", content = @Content(schema = @Schema(type = "integer", defaultValue = "0"))),
             @Parameter(in = ParameterIn.QUERY, name = "size", description = "Quantidade de elementos exibidos por página.", content = @Content(schema = @Schema(type = "integer", defaultValue = "5"))),
             @Parameter(in = ParameterIn.QUERY, name = "sort", hidden = true, description = "Critério de ordenação dos elementos retornados.", array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,asc")))
@@ -85,7 +90,7 @@ public class UserController {
         return ResponseEntity.ok(PageableMapper.toDto(projection));
     }
 
-    @Operation(summary = "Excluir usuário", description = "Exclui um usuário existente pelo seu Id. É necessário estar autenticado para acessar este recurso.", security = @SecurityRequirement(name = "security"), tags = {"Usuarios","Excluir"}, parameters = @Parameter(in = ParameterIn.PATH, name = "id", description = "Id de um usuário cadastrado no sistema."), responses = {
+    @Operation(summary = "Excluir usuário", description = "Exclui um usuário existente pelo seu Id. É necessário estar autenticado para acessar este recurso.", security = @SecurityRequirement(name = "security"), tags = {"Usuarios", "Excluir"}, parameters = @Parameter(in = ParameterIn.PATH, name = "id", description = "Id de um usuário cadastrado no sistema."), responses = {
             @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso!"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "403", description = "O usuário não possui permissão para visualizar este recurso.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class)))
@@ -97,7 +102,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Atualizar usuário",description = "Atualiza a senha do usuário autenticado que enviou a requisição. É necessário estar autenticado para acessar este recurso.",security = @SecurityRequirement(name = "security"), tags = {"Usuarios","Atualizar"}, responses = {
+    @Operation(summary = "Atualizar usuário", description = "Atualiza a senha do usuário autenticado que enviou a requisição. É necessário estar autenticado para acessar este recurso.", security = @SecurityRequirement(name = "security"), tags = {"Usuarios", "Atualizar"}, responses = {
             @ApiResponse(responseCode = "204", description = "Senha atualizada com sucesso!"),
             @ApiResponse(responseCode = "422", description = "Dados informados são inválidos.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "400", description = "Possíveis causas:<br/>" +
@@ -110,4 +115,34 @@ public class UserController {
         userService.updatePassword(dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmationPassword(), details);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Ativar conta", description = "Ativa a conta de um usuário inativo existente no sistema. É necessário estar autenticado para acessar este recurso, pode ser acessado por: <br/> - Clientes quando o id informado é igual ao id do cliente autenticado<br/> - Administradores", security = @SecurityRequirement(name = "security"), tags = {"Usuarios", "E-mail"}, responses = {
+            @ApiResponse(responseCode = "200", description = "Conta ativada com sucesso!", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
+
+            @ApiResponse(responseCode = "400", description = "Token inválido.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "409", description = "Token já consumido pelo usuário.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    })
+
+    @RequestMapping(value = "/activate-account/{id}", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<String> activateAccount(@PathVariable Long id, @RequestParam String token) {
+        return ResponseEntity.ok(activationService.activateAccount(id, token));
+    }
+
+    @Operation(summary = "Enviar e-mail", description = "Envia um e-mail com base no 'template' a um usuário existente no sistema. É necessário estar autenticado para acessar este recurso e é restrito somente a administradores.", security = @SecurityRequirement(name = "security"), tags = {"Usuarios", "E-mail"}, responses = {
+            @ApiResponse(responseCode = "204", description = "E-mail enviado com sucesso!"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
+            @ApiResponse(responseCode = "403", description = "O usuário não possui permissão para visualizar este recurso.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
+            @ApiResponse(responseCode = "409", description = "Token já consumido pelo usuário.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/send-email")
+    public ResponseEntity<Void> sendMail(@RequestBody @Valid TemplateDto dto) {
+        User user = userService.loadUserByUsername(dto.getUsername(), true);
+        userService.checkIfUserIsActive(user);
+
+        emailService.sendMail(user.getUsername(), dto.getTemplate());
+        return ResponseEntity.noContent().build();
+    }
+
 }

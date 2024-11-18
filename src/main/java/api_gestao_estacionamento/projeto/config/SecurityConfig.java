@@ -15,7 +15,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
@@ -41,7 +46,8 @@ public class SecurityConfig {
                         antMatcher("/documentacao/**"),
                         antMatcher("/swagger-ui"),
                         antMatcher("/swagger-ui/**"),
-                        antMatcher("/v3/api-docs/**")
+                        antMatcher("/v3/api-docs/**"),
+                        antMatcher(userResourceBaseUrl + "/activate-account/**")
                 ).permitAll().anyRequest().authenticated())
                 .exceptionHandling(x -> x.authenticationEntryPoint(new JwtEntryPoint()))
                 .addFilterBefore(requestFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -50,12 +56,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtRequestFilter requestFilter(){
+    public JwtRequestFilter requestFilter() {
         return new JwtRequestFilter();
     }
 
     @Bean
-    public PasswordEncoder encoder(){
+    public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -63,4 +69,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
 }

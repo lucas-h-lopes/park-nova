@@ -26,18 +26,24 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
-        if (token == null || !token.startsWith("Bearer ")) {
-            log.info("Token está nulo ou não inicializado com 'Bearer '");
-            filterChain.doFilter(request, response);
-            return;
+        String path = request.getRequestURI();
+        log.info("PATH {}", path);
+        if (!path.startsWith("/api/v1/users/activate-account/") &&
+                (!path.equals("/api/v1/users") || !request.getMethod().equals("POST")) &&
+                !path.equals("/api/v1/login")) {
+            if (token == null || !token.startsWith("Bearer ")) {
+                log.info("Token está nulo ou não inicializado com 'Bearer '");
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if (!jwtUtils.isTokenValid(token)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            String username = jwtUtils.getSubject(token);
+            authenticate(username, request);
         }
-        if (!jwtUtils.isTokenValid(token)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        String username = jwtUtils.getSubject(token);
-        authenticate(username, request);
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 
     public void authenticate(String username, HttpServletRequest request) {

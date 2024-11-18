@@ -29,7 +29,8 @@ public class SpringdocConfig {
                                 new Tag().name("Buscar um").description("Endpoints para buscar um único recurso"),
                                 new Tag().name("Buscar todos").description("Endpoints para buscar todos os recurso de forma paginada"),
                                 new Tag().name("Atualizar").description("Endpoints para atualizar um recurso"),
-                                new Tag().name("Excluir").description("Endpoints para excluir um recurso")
+                                new Tag().name("Excluir").description("Endpoints para excluir um recurso"),
+                                new Tag().name("E-mail").description("Endpoints responsáveis pelo envio de e-mails ou que realizam operações relacionadas")
                         )
                 );
     }

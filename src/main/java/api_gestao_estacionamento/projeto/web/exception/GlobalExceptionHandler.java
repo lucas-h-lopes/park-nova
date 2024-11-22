@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({UsernameUniqueViolationException.class, ActivationTokenAlreadyUsedException.class})
+    @ExceptionHandler({UsernameUniqueViolationException.class, ActivationTokenAlreadyUsedException.class, CpfUniqueViolationException.class})
     public ResponseEntity<CustomExceptionBody> uniqueViolationExceptionHandler(RuntimeException e, HttpServletRequest request) {
         logError(request, e);
         CustomExceptionBody error = new CustomExceptionBody(request, HttpStatus.CONFLICT, e.getMessage());

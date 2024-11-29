@@ -8,6 +8,7 @@ import api_gestao_estacionamento.projeto.service.exception.ActivationTokenAlread
 import api_gestao_estacionamento.projeto.service.exception.EntityNotFoundException;
 import api_gestao_estacionamento.projeto.service.exception.PasswordInvalidPassword;
 import api_gestao_estacionamento.projeto.service.exception.UsernameUniqueViolationException;
+import api_gestao_estacionamento.projeto.util.ActivationTokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +31,7 @@ public class UserService {
         try {
             u.setPassword(encoder.encode(u.getPassword()));
             u.setName(u.getName().trim());
+            u.setActivationToken(ActivationTokenUtils.generateActivationToken());
             return userRepository.save(u);
         } catch (DataIntegrityViolationException e) {
             throw new UsernameUniqueViolationException(String.format("O nome de usuário '%s' já está cadastrado no sistema", u.getUsername()));
@@ -68,7 +70,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User loadUserByUsername(String username, boolean throwExceptionDefaultMessageIfNotFound) {
-        if(throwExceptionDefaultMessageIfNotFound) {
+        if (throwExceptionDefaultMessageIfNotFound) {
             return userRepository.loadUserByUsername(username).orElseThrow(
                     () -> new EntityNotFoundException(String.format("Usuário com username '%s' não foi encontrado no sistema", username))
             );
@@ -77,7 +79,7 @@ public class UserService {
                 () -> new EntityNotFoundException("Email e/ou senha inválidos")
         );
     }
-    
+
     public boolean checkIfUserIsActive(User u) {
         if (u.isActive()) {
             throw new ActivationTokenAlreadyUsedException("O usuário já está ativo no sistema");

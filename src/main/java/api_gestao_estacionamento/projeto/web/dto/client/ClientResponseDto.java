@@ -1,6 +1,5 @@
 package api_gestao_estacionamento.projeto.web.dto.client;
 
-import api_gestao_estacionamento.projeto.model.Address;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -10,8 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
 
 @Getter
 @Setter

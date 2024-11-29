@@ -5,11 +5,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.format.DateTimeParseException;
 
 @RestControllerAdvice
 @Slf4j
@@ -41,8 +44,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(403).body(error);
     }
 
-    @ExceptionHandler(InactiveAccountException.class)
-    public ResponseEntity<CustomExceptionBody> customForbiddenExceptionHandler(InactiveAccountException e, HttpServletRequest request) {
+    @ExceptionHandler({InactiveAccountException.class, ForbiddenException.class})
+    public ResponseEntity<CustomExceptionBody> customForbiddenExceptionHandler(Exception e, HttpServletRequest request) {
         logError(request, e);
         CustomExceptionBody error = new CustomExceptionBody(request, HttpStatus.FORBIDDEN, e.getMessage());
         return ResponseEntity.status(403).body(error);
@@ -55,6 +58,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(400).body(error);
     }
 
+    @ExceptionHandler({DateTimeParseException.class, HttpMessageNotReadableException.class})
+    public ResponseEntity<CustomExceptionBody> dateTimeParseException(DateTimeParseException e, HttpServletRequest request) {
+        logError(request, e);
+        CustomExceptionBody error = new CustomExceptionBody(request, HttpStatus.BAD_REQUEST, "Formatação inválida para a data. Utilize dd/MM/yyyy");
+        return ResponseEntity.status(400).body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomExceptionBody> genericExceptionHandler(Exception e, HttpServletRequest request) {
         logError(request, e);
@@ -63,6 +73,6 @@ public class GlobalExceptionHandler {
     }
 
     private void logError(HttpServletRequest request, Exception e) {
-        log.info("Error at {}: {}", request.getRequestURI(), e.getMessage());
+        log.info("Error at {}: {}", request.getRequestURI(), e.getMessage(), e);
     }
 }

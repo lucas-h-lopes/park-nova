@@ -58,8 +58,6 @@ public class EmailService {
         if ((Duration.between(user.getLastModifiedAt(), LocalDateTime.now()).toHours() > 24) && (!user.isActive())) {
             user.setActivationToken(ActivationTokenUtils.generateActivationToken());
         }
-
-
         EmailTemplate emailTemplate = TemplateUtils.getTemplate(template, user, user.getActivationToken());
         MimeMessage message = prepareMimeMessage(username, emailTemplate);
         if (message != null && !user.isActive()) {

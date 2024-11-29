@@ -12,12 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -52,15 +54,21 @@ public class EmailService {
     @Async
     @Transactional
     public void sendMail(String username, String template) {
-            User user = userService.loadUserByUsername(username, true);
-            String activationToken = ActivationTokenUtils.generateActivationToken();
+        User user = userService.loadUserByUsername(username, true);
+        if ((Duration.between(user.getLastModifiedAt(), LocalDateTime.now()).toHours() > 24) && (!user.isActive())) {
+            user.setActivationToken(ActivationTokenUtils.generateActivationToken());
+        }
 
-            EmailTemplate emailTemplate = TemplateUtils.getTemplate(template, user, activationToken);
-            MimeMessage message = prepareMimeMessage(username, emailTemplate);
-            if (message != null && !user.isActive()) {
+
+        EmailTemplate emailTemplate = TemplateUtils.getTemplate(template, user, user.getActivationToken());
+        MimeMessage message = prepareMimeMessage(username, emailTemplate);
+        if (message != null && !user.isActive()) {
+            try {
                 javaMailSender.send(message);
-                user.setActivationToken(activationToken);
+            } catch (Exception e) {
+                log.info("Não foi possível enviar o email");
             }
         }
     }
+}
 

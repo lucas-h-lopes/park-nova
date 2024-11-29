@@ -125,7 +125,7 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "Token já consumido pelo usuário.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     })
 
-    @RequestMapping(value = "/activate-account/{id}", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/activate-account/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> activateAccount(@PathVariable Long id, @RequestParam String token) {
         return ResponseEntity.ok(activationService.activateAccount(id, token));
     }

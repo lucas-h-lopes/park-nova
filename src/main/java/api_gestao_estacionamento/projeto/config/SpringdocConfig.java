@@ -25,6 +25,7 @@ public class SpringdocConfig {
                 .tags(Arrays.asList(
                                 new Tag().name("Login").description("Recurso para autenticar no sistema"),
                                 new Tag().name("Usuarios").description("Recursos para gerenciamento de usuários"),
+                                new Tag().name("Clientes").description("Recursos para gerenciamento de clientes"),
                                 new Tag().name("Criar").description("Endpoints para criar um recurso"),
                                 new Tag().name("Buscar um").description("Endpoints para buscar um único recurso"),
                                 new Tag().name("Buscar todos").description("Endpoints para buscar todos os recurso de forma paginada"),

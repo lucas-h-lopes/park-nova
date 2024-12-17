@@ -3,40 +3,41 @@ package api_gestao_estacionamento.projeto.config;
 import api_gestao_estacionamento.projeto.model.User;
 import api_gestao_estacionamento.projeto.repository.UserRepository;
 import api_gestao_estacionamento.projeto.service.UserService;
-import api_gestao_estacionamento.projeto.util.ActivationTokenUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-
-import java.time.LocalDateTime;
 
 @Configuration
 @Slf4j
 public class DbSeedingConfig {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    private final User admin;
+
+    private final User client;
+
+    public DbSeedingConfig(UserRepository userRepository, UserService userService, User admin, @Qualifier("client") User client) {
+        this.userRepository = userRepository;
+        this.userService = userService;
+        this.admin = admin;
+        this.client = client;
+    }
 
     @PostConstruct
     public void insertAdminIntoDb() {
         if (userRepository.loadUserByUsername("admin@email.com").isEmpty()) {
-            User user = new User();
-            user.setName("ADMIN");
-            user.setUsername("admin@email.com");
-            user.setPassword("123456");
-            user.setRole(User.Role.ROLE_ADMIN);
-            user.setCreatedBy("dbSeeding");
-            user.setLastModifiedBy("dbSeeding");
-            user.setCreatedAt(LocalDateTime.now());
-            user.setLastModifiedAt(LocalDateTime.now());
-            user.setActive(true);
-            user.setActivationToken(ActivationTokenUtils.generateActivationToken());
+            userService.insert(admin);
+        }
+    }
 
-            userService.insert(user);
+    @PostConstruct
+    public void insertClientIntoDb() {
+        if (userRepository.loadUserByUsername("client@email.com").isEmpty()) {
+            userService.insert(client);
         }
     }
 }

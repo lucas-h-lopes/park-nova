@@ -1,8 +1,9 @@
 package api_gestao_estacionamento.projeto.config;
 
+import api_gestao_estacionamento.projeto.config.properties.BaseUrlConfigProperties;
 import api_gestao_estacionamento.projeto.jwt.JwtEntryPoint;
 import api_gestao_estacionamento.projeto.jwt.JwtRequestFilter;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,25 +16,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableMethodSecurity
 @EnableWebMvc
+@AllArgsConstructor
 public class SecurityConfig {
 
-    @Value("${user.baseUrl}")
-    private String userResourceBaseUrl;
-
-    @Value("${login.authenticate}")
-    private String authenticateResourceBaseUrl;
+    private BaseUrlConfigProperties configProperties;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
@@ -41,13 +34,13 @@ public class SecurityConfig {
                 .formLogin(x -> x.disable())
                 .httpBasic(x -> x.disable())
                 .authorizeHttpRequests(x -> x.requestMatchers(
-                        antMatcher(HttpMethod.POST, userResourceBaseUrl),
-                        antMatcher(HttpMethod.POST, authenticateResourceBaseUrl),
+                        antMatcher(HttpMethod.POST, configProperties.getUser()),
+                        antMatcher(HttpMethod.POST, configProperties.getLogin()),
                         antMatcher("/documentacao/**"),
                         antMatcher("/swagger-ui"),
                         antMatcher("/swagger-ui/**"),
                         antMatcher("/v3/api-docs/**"),
-                        antMatcher(userResourceBaseUrl + "/activate-account/**")
+                        antMatcher(configProperties.getUser() + "/activate-account/**")
                 ).permitAll().anyRequest().authenticated())
                 .exceptionHandling(x -> x.authenticationEntryPoint(new JwtEntryPoint()))
                 .addFilterBefore(requestFilter(), UsernamePasswordAuthenticationFilter.class)

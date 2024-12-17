@@ -1,15 +1,12 @@
 package api_gestao_estacionamento.projeto.jwt;
 
+import api_gestao_estacionamento.projeto.config.properties.JwtConfigProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -19,19 +16,14 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @Component
-@NoArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class JwtUtils {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-    @Value("${jwt.bearer}")
-    private String bearer;
-    @Value("${jwt.authorization}")
-    private String authorization;
+    private final JwtConfigProperties jwtConfigProperties;
 
     private SecretKey generateSecretKey(){
-        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(jwtConfigProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
     private final Integer EXPIRATION_MINUTES = 30;
@@ -55,7 +47,7 @@ public class JwtUtils {
                     .compact();
             return new JwtToken(token);
         }catch(JwtException e){
-            log.info("Falha na geração do token: {}", e);
+            log.info("Falha na geração do token: ", e);
         }
         return null;
     }
@@ -65,7 +57,7 @@ public class JwtUtils {
             return Jwts.parser().verifyWith(generateSecretKey()).build()
                     .parseSignedClaims(removeBearerFromToken(token)).getPayload();
         }catch(JwtException e){
-            log.info("Falha ao retornar os dados do token: {}", e);
+            log.info("Falha ao retornar os dados do token: ", e);
         }
         return null;
     }
@@ -86,10 +78,9 @@ public class JwtUtils {
     }
 
     private String removeBearerFromToken(String token){
-        if(token.startsWith(bearer)){
-            return token.substring(bearer.length());
+        if(token.startsWith(jwtConfigProperties.getBearer())){
+            return token.substring(jwtConfigProperties.getBearer().length());
         }
         return token;
     }
-
 }

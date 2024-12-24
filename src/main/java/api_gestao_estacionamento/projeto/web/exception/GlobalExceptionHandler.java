@@ -18,7 +18,7 @@ import java.time.format.DateTimeParseException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({UsernameUniqueViolationException.class, ActivationTokenAlreadyUsedException.class, CpfUniqueViolationException.class})
+    @ExceptionHandler({UsernameUniqueViolationException.class, ActivationTokenAlreadyUsedException.class, CpfUniqueViolationException.class, CodeUniqueViolationException.class})
     public ResponseEntity<CustomExceptionBody> uniqueViolationExceptionHandler(RuntimeException e, HttpServletRequest request) {
         logError(request, e);
         CustomExceptionBody error = new CustomExceptionBody(request, HttpStatus.CONFLICT, e.getMessage());
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(403).body(error);
     }
 
-    @ExceptionHandler({PasswordInvalidPassword.class, InvalidActivationTokenException.class, InvalidTemplateException.class})
+    @ExceptionHandler({PasswordInvalidPassword.class, InvalidActivationTokenException.class, InvalidTemplateException.class, SpotStatusInvalidException.class})
     public ResponseEntity<CustomExceptionBody> badRequestExceptionHandler(RuntimeException e, HttpServletRequest request) {
         logError(request, e);
         CustomExceptionBody error = new CustomExceptionBody(request, HttpStatus.BAD_REQUEST, e.getMessage());

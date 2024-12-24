@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class ClientCreateDto {
 
     @NotBlank(message = "A rua não deve ser nula, vazia ou possuir somente espaços em branco")

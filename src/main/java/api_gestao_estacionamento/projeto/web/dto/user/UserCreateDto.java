@@ -1,5 +1,6 @@
 package api_gestao_estacionamento.projeto.web.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class UserCreateDto {
     @NotBlank(message = "O nome não pode ser nulo, vazio ou conter somente espaços em branco")
     @Size(min = 3, max = 100, message = "O nome deve possuir 3-100 caracteres")

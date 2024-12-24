@@ -18,7 +18,7 @@ public class ProjetoApplication {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(ProjetoApplication.class);
 
 		builder.bannerMode(Banner.Mode.OFF);
-		builder.properties("server.port=8081");
+		//builder.properties("server.port=8081");
 
 		builder.run(args);
 

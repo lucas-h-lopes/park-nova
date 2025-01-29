@@ -18,7 +18,7 @@ import java.time.format.DateTimeParseException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({UsernameUniqueViolationException.class, ActivationTokenAlreadyUsedException.class, CpfUniqueViolationException.class, CodeUniqueViolationException.class})
+    @ExceptionHandler({UsernameUniqueViolationException.class, UserIsAlreadyActiveException.class, CpfUniqueViolationException.class, CodeUniqueViolationException.class, InactiveAccountException.class})
     public ResponseEntity<CustomExceptionBody> uniqueViolationExceptionHandler(RuntimeException e, HttpServletRequest request) {
         logError(request, e);
         CustomExceptionBody error = new CustomExceptionBody(request, HttpStatus.CONFLICT, e.getMessage());
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(403).body(error);
     }
 
-    @ExceptionHandler({InactiveAccountException.class, ForbiddenException.class})
+    @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<CustomExceptionBody> customForbiddenExceptionHandler(Exception e, HttpServletRequest request) {
         logError(request, e);
         CustomExceptionBody error = new CustomExceptionBody(request, HttpStatus.FORBIDDEN, e.getMessage());

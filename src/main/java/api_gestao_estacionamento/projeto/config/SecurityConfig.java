@@ -31,6 +31,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
         return security.csrf(x -> x.disable())
+               // .cors(x -> x.configurationSource(corsConfigurationSource()))
                 .formLogin(x -> x.disable())
                 .httpBasic(x -> x.disable())
                 .authorizeHttpRequests(x -> x.requestMatchers(
@@ -63,4 +64,17 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /*
+    private CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500", "http://127.0.0.1:5500/index.html"));
+        corsConfiguration.setAllowedMethods(List.of("POST", "GET"));
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
+    }
+     */
 }

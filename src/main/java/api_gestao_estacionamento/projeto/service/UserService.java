@@ -4,9 +4,9 @@ import api_gestao_estacionamento.projeto.jwt.JwtUserDetails;
 import api_gestao_estacionamento.projeto.model.User;
 import api_gestao_estacionamento.projeto.repository.UserRepository;
 import api_gestao_estacionamento.projeto.repository.projection.UserProjection;
-import api_gestao_estacionamento.projeto.service.exception.ActivationTokenAlreadyUsedException;
 import api_gestao_estacionamento.projeto.service.exception.EntityNotFoundException;
 import api_gestao_estacionamento.projeto.service.exception.PasswordInvalidPassword;
+import api_gestao_estacionamento.projeto.service.exception.UserIsAlreadyActiveException;
 import api_gestao_estacionamento.projeto.service.exception.UsernameUniqueViolationException;
 import api_gestao_estacionamento.projeto.util.ActivationTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -80,11 +80,10 @@ public class UserService {
         );
     }
 
-    public boolean checkIfUserIsActive(User u) {
+    public void throwExceptionIfUserIsActive(User u) {
         if (u.isActive()) {
-            throw new ActivationTokenAlreadyUsedException("O usuário já está ativo no sistema");
+            throw new UserIsAlreadyActiveException("O usuário já está ativo no sistema");
         }
-        return true;
     }
 
     @Transactional(readOnly = true)

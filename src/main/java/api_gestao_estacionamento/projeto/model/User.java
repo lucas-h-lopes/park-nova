@@ -2,10 +2,7 @@ package api_gestao_estacionamento.projeto.model;
 
 import api_gestao_estacionamento.projeto.web.dto.user.UserCreateDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -23,6 +20,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
+@ToString
 public class User implements Serializable {
 
     @Id

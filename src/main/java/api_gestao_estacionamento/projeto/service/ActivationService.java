@@ -1,7 +1,6 @@
 package api_gestao_estacionamento.projeto.service;
 
 import api_gestao_estacionamento.projeto.model.User;
-import api_gestao_estacionamento.projeto.service.exception.ActivationTokenAlreadyUsedException;
 import api_gestao_estacionamento.projeto.service.exception.InvalidActivationTokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ public class ActivationService {
             throw new InvalidActivationTokenException("Token inválido");
         }
 
-        userService.checkIfUserIsActive(user);
+        userService.throwExceptionIfUserIsActive(user);
 
         if ((Duration.between(user.getLastModifiedAt(), LocalDateTime.now()).toHours() > 24) && (!user.isActive())) {
             return "Token expirado por inatividade, solicite a um administrador um novo código.";

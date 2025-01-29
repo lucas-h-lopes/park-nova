@@ -1,13 +1,16 @@
 package api_gestao_estacionamento.projeto.service.mail;
 
 import api_gestao_estacionamento.projeto.model.User;
+import api_gestao_estacionamento.projeto.service.ActivationService;
 import api_gestao_estacionamento.projeto.service.UserService;
 import api_gestao_estacionamento.projeto.service.mail.templates.EmailTemplate;
 import api_gestao_estacionamento.projeto.util.ActivationTokenUtils;
 import api_gestao_estacionamento.projeto.util.TemplateUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,10 +27,10 @@ import java.time.LocalDateTime;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Setter
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")
     private String sender;
@@ -45,7 +48,7 @@ public class EmailService {
             helper.setText(emailTemplate.getText(), true);
 
             return mimeMessage;
-        } catch (MailException | MessagingException e) {
+        } catch (MessagingException e) {
             log.info("Falha no envio de email - {}", e.getLocalizedMessage());
         }
         return null;
@@ -53,14 +56,17 @@ public class EmailService {
 
     @Async
     @Transactional
-    public void sendMail(String username, String template) {
+    public void sendMail(String username, EmailTemplate template) {
         User user = userService.loadUserByUsername(username, true);
+
         if ((Duration.between(user.getLastModifiedAt(), LocalDateTime.now()).toHours() > 24) && (!user.isActive())) {
-            user.setActivationToken(ActivationTokenUtils.generateActivationToken());
+            String token = ActivationTokenUtils.generateActivationToken();
+            user.setActivationToken(token);
+            template.setUserToken(token);
         }
-        EmailTemplate emailTemplate = TemplateUtils.getTemplate(template, user, user.getActivationToken());
-        MimeMessage message = prepareMimeMessage(username, emailTemplate);
-        if (message != null && !user.isActive()) {
+
+        MimeMessage message = prepareMimeMessage(username, template);
+        if (message != null) {
             try {
                 javaMailSender.send(message);
             } catch (Exception e) {
@@ -68,5 +74,6 @@ public class EmailService {
             }
         }
     }
+
 }
 

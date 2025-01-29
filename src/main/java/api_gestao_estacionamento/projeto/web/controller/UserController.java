@@ -62,7 +62,7 @@ public class UserController {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(user.getId()).toUri();
-        emailService.sendMail(user.getUsername(),
+        emailService.sendMail(user,
                 TemplateUtils.getTemplate(EmailTemplateEnum.WELCOME, user));
         return ResponseEntity.created(uri).body(result);
     }
@@ -150,7 +150,7 @@ public class UserController {
         EmailTemplateEnum toEnum = EmailTemplateEnum.valueOf(dto.getTemplate().toUpperCase());
         EmailTemplate template = TemplateUtils.getTemplate(toEnum, user);
 
-        emailService.sendMail(user.getUsername(), template);
+        emailService.sendMail(user, template);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,12 +1,8 @@
 package api_gestao_estacionamento.projeto;
 
-import api_gestao_estacionamento.projeto.config.properties.BaseUrlConfigProperties;
-import api_gestao_estacionamento.projeto.config.properties.JwtConfigProperties;
 import org.springframework.boot.Banner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication

@@ -6,9 +6,11 @@ import api_gestao_estacionamento.projeto.repository.projection.UserProjection;
 import api_gestao_estacionamento.projeto.service.ActivationService;
 import api_gestao_estacionamento.projeto.service.UserService;
 import api_gestao_estacionamento.projeto.service.mail.EmailService;
+import api_gestao_estacionamento.projeto.service.mail.templates.EmailTemplate;
+import api_gestao_estacionamento.projeto.service.mail.templates.enums.EmailTemplateEnum;
 import api_gestao_estacionamento.projeto.util.TemplateUtils;
+import api_gestao_estacionamento.projeto.web.dto.email.EmailDto;
 import api_gestao_estacionamento.projeto.web.dto.pageable.PageableDto;
-import api_gestao_estacionamento.projeto.web.dto.template.TemplateDto;
 import api_gestao_estacionamento.projeto.web.dto.user.UserCreateDto;
 import api_gestao_estacionamento.projeto.web.dto.user.UserNewPasswordDto;
 import api_gestao_estacionamento.projeto.web.dto.user.UserResponseDto;
@@ -60,7 +62,8 @@ public class UserController {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(user.getId()).toUri();
-        emailService.sendMail(user.getUsername(), "WELCOME");
+        emailService.sendMail(user.getUsername(),
+                TemplateUtils.getTemplate(EmailTemplateEnum.WELCOME, user));
         return ResponseEntity.created(uri).body(result);
     }
 
@@ -134,18 +137,20 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "E-mail enviado com sucesso!"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "403", description = "O usuário não possui permissão para visualizar este recurso.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
-            @ApiResponse(responseCode = "409", description = "O usuário já está ativo no sistema.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "409", description = "Não é possível enviar o template informado ao usuário.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "422", description = "Dados informados são inválidos.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionBody.class))),
             @ApiResponse(responseCode = "400", description = "Template não existente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/send-email")
-    public ResponseEntity<Void> sendMail(@RequestBody @Valid TemplateDto dto) {
+    public ResponseEntity<Void> sendMail(@RequestBody @Valid EmailDto dto) {
         User user = userService.loadUserByUsername(dto.getUsername(), true);
-        userService.checkIfUserIsActive(user);
-        TemplateUtils.isTemplateValid(dto.getTemplate());
+        TemplateUtils.validateTemplate(user, dto.getTemplate());
 
-        emailService.sendMail(user.getUsername(), dto.getTemplate());
+        EmailTemplateEnum toEnum = EmailTemplateEnum.valueOf(dto.getTemplate().toUpperCase());
+        EmailTemplate template = TemplateUtils.getTemplate(toEnum, user);
+
+        emailService.sendMail(user.getUsername(), template);
         return ResponseEntity.noContent().build();
     }
 

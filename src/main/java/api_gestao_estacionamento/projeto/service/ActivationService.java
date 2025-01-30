@@ -27,7 +27,7 @@ public class ActivationService {
 
         userService.throwExceptionIfUserIsActive(user);
 
-        if ((Duration.between(user.getLastModifiedAt(), LocalDateTime.now()).toHours() > 24) && (!user.isActive())) {
+        if ((Duration.between(user.getLastModifiedAt(), LocalDateTime.now()).toHours() > 24)) {
             return "Token expirado por inatividade, solicite a um administrador um novo código.";
         } else {
             user.setActive(true);

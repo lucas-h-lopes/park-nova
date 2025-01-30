@@ -24,6 +24,7 @@ public class UserBuilder {
         userBuilder.user.setLastModifiedBy("System");
         userBuilder.user.setPassword("123456");
         userBuilder.user.setActive(false);
+        userBuilder.user.setId(100L);
 
         return userBuilder;
     }
@@ -41,6 +42,7 @@ public class UserBuilder {
         userBuilder.user.setLastModifiedBy("System");
         userBuilder.user.setPassword("123456");
         userBuilder.user.setActive(false);
+        userBuilder.user.setId(100L);
 
         return userBuilder;
     }
@@ -58,6 +60,7 @@ public class UserBuilder {
         userBuilder.user.setLastModifiedBy("System");
         userBuilder.user.setPassword("123456");
         userBuilder.user.setActive(true);
+        userBuilder.user.setId(100L);
 
         return userBuilder;
     }
@@ -75,6 +78,7 @@ public class UserBuilder {
         userBuilder.user.setLastModifiedBy("System");
         userBuilder.user.setPassword("123456");
         userBuilder.user.setActive(false);
+        userBuilder.user.setId(100L);
 
         return userBuilder;
     }

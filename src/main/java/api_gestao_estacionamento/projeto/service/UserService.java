@@ -5,7 +5,7 @@ import api_gestao_estacionamento.projeto.model.User;
 import api_gestao_estacionamento.projeto.repository.UserRepository;
 import api_gestao_estacionamento.projeto.repository.projection.UserProjection;
 import api_gestao_estacionamento.projeto.service.exception.EntityNotFoundException;
-import api_gestao_estacionamento.projeto.service.exception.PasswordInvalidPassword;
+import api_gestao_estacionamento.projeto.service.exception.PasswordInvalidException;
 import api_gestao_estacionamento.projeto.service.exception.UserIsAlreadyActiveException;
 import api_gestao_estacionamento.projeto.service.exception.UsernameUniqueViolationException;
 import api_gestao_estacionamento.projeto.util.ActivationTokenUtils;
@@ -53,11 +53,11 @@ public class UserService {
     @Transactional
     public void updatePassword(String currentPassword, String newPassword, String confirmationPassword, JwtUserDetails details) {
         if (!newPassword.equals(confirmationPassword)) {
-            throw new PasswordInvalidPassword("A nova senha e confirmação de senha não conferem");
+            throw new PasswordInvalidException("A nova senha e confirmação de senha não conferem");
         }
         User user = findUserById(details.getId());
         if (!encoder.matches(currentPassword, user.getPassword())) {
-            throw new PasswordInvalidPassword("A senha atual não confere com a senha do usuário");
+            throw new PasswordInvalidException("A senha atual não confere com a senha do usuário");
         }
         user.setPassword(encoder.encode(newPassword));
     }

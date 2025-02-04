@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(403).body(error);
     }
 
-    @ExceptionHandler({PasswordInvalidPassword.class, InvalidActivationTokenException.class, InvalidTemplateException.class, SpotStatusInvalidException.class})
+    @ExceptionHandler({PasswordInvalidException.class, InvalidActivationTokenException.class, InvalidTemplateException.class, SpotStatusInvalidException.class})
     public ResponseEntity<CustomExceptionBody> badRequestExceptionHandler(RuntimeException e, HttpServletRequest request) {
         logError(request, e);
         CustomExceptionBody error = new CustomExceptionBody(request, HttpStatus.BAD_REQUEST, e.getMessage());
